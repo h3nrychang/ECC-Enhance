@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文件上传解析</title>
+</head>
+<body>
+请上传“拜访表”。必要字段如下：连锁门店名字、单位实际人数、异网运营商、关键人姓名、关键人电话、友商已有业务、友商合同价格、友商产品到期时间、备注、更新时间
+<br>
+{#使用WPS可能导致无法将导入表格保存为标准的Excel格式导致程序报错。#}
+{#<br>#}
+<a href="{{ url_for('static', filename='连锁门店拜访录入信息模板.xlsx') }}">下载模板</a>
+  <form action="import" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xlsx" required>
+    <br><br>
+    <button type="submit">上传</button>
+  </form>
+</body>
+</html>

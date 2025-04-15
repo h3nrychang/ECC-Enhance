@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>园区列表（弃用）</h1>
+<a href="add">添加</a>
+<a href="import">批量导入</a>
+<hr>
+<table>
+    <tr>
+        <td>名称</td>
+        <td>企业</td>
+        <td>操作</td>
+    </tr>
+
+    {% for businessPark in businessParkList %}
+        <tr>
+            {#    {{ businessPark.id }}，#}
+            <td>{{ businessPark.name }}</td>
+            <td>{{ businessPark.company_name }}</td>
+            <td>
+                <a href="update?id={{ businessPark.id }}">修改</a>
+                <a href="delete/{{ businessPark.id }}">删除</a>
+            </td>
+        </tr>
+        {#            <br>#}
+    {% endfor %}
+
+</table>
+
+
+</body>
+</html>

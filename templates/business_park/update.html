@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改楼园</title>
+</head>
+<body>
+修改楼园
+<form action="update" method="post">
+    <table>
+        {{ form.csrf_token }}
+        <tr>
+            <td>{{ form.name.label }}</td>
+            <td>{{ form.name }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.company_name.label }}</td>
+            <td>{{ form.company_name }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.submit }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.id(type='hidden') }}</td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

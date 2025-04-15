@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>处理完成</title>
+</head>
+<body>
+    <h2>Excel 文件处理成功！</h2>
+    <a href="{{ url_for('analysis.download_file', filename=filename) }}">
+        <button>下载处理后的文件</button>
+    </a>
+</body>
+</html>

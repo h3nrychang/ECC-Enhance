@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>区县自定义字段列表</title>
+    <!-- 引入 Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+
+    <!-- 页面主容器 -->
+    <div class="max-w-4xl mx-auto p-6">
+
+        <!-- 问卷标题 -->
+        <h1 class="text-3xl font-semibold text-center mb-8 text-blue-600">{{ q.code }} - 区县自定义字段列表</h1>
+
+        <!-- 问卷表单 -->
+        <form id="questionnaireForm" class="space-y-6">
+            {% for question in questions %}
+                <div class="question space-y-2">
+                    <label for="q{{ question.id }}" class="block text-lg font-medium text-gray-800">{{ question['title'] }}</label>
+
+                    <!-- 根据问题类型选择不同的输入框 -->
+                    {% if question['input_type'] == 'text' %}
+                        <input type="text" id="q{{ question.id }}" name="q{{ question.id }}"
+                            {% if question['maxlength'] %}maxlength="{{ question['maxlength'] }}"{% endif %}
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300" />
+                    {% elif question['input_type'] == 'number' %}
+                        <input type="number" id="q{{ question.id }}" name="q{{ question.id }}"
+                            {% if question['maxlength'] %}maxlength="{{ question['maxlength'] }}"{% endif %}
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300" />
+                    {% elif question['input_type'] == 'date' %}
+                        <input type="date" id="q{{ question.id }}" name="q{{ question.id }}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300" />
+                    {% else %}
+                        <input type="text" id="q{{ question.id }}" name="q{{ question.id }}"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300" />
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </form>
+
+        <!-- 用于存储 JSON 字符串的隐藏文本框 -->
+        <textarea id="jsonOutput" style="display: none;"></textarea>
+
+        <!-- 按钮，用于将 JSON 字符串复制到剪贴板 -->
+        <div class="text-center">
+            <button id="copyButton" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300">
+                完成并复制
+            </button>
+        </div>
+
+    </div>
+
+<script>
+    const questionnaireCode = "{{ q.code }}";
+
+    document.getElementById("copyButton").onclick = function() {
+        const form = document.getElementById("questionnaireForm");
+        const formData = new FormData(form);
+        const answers = [];
+
+        formData.forEach(function(value, key) {
+            const inputElement = form.querySelector(`[name="${key}"]`);
+
+            // 如果是 date 类型，去掉 "-"
+            if (inputElement && inputElement.type === "date") {
+                value = value.replace(/-/g, ""); // e.g., "2025-04-14" -> "20250414"
+            }
+
+            answers.push(value);
+        });
+
+        const jsonData = {
+            questionnaire_code: questionnaireCode,
+            answers: answers
+        };
+
+        const jsonString = JSON.stringify(jsonData, null, 2);
+        document.getElementById("jsonOutput").value = jsonString;
+
+        navigator.clipboard.writeText(jsonString).then(function() {
+            alert("数据已复制到剪贴板！");
+        }).catch(function(error) {
+            console.error("复制失败", error);
+        });
+    };
+</script>
+
+
+
+
+</body>
+</html>

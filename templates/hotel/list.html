@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>酒店渗透情况列表</h1>
+<a href="/">返回</a>
+<a href="add">添加</a>
+<a href="import">导入拜访信息</a>
+<a href="export">导出渗透信息</a>
+<hr>
+<table>
+    <tr>
+        <td>酒店名称</td>
+{#        <td>楼园名称</td>#}
+        <td>单位实际人数</td>
+        <td>异网运营商</td>
+        <td>关键人姓名</td>
+        <td>关键人电话</td>
+        <td>友商已有业务</td>
+        <td>友商合同价格</td>
+        <td>友商产品到期时间</td>
+        <td>拜访人</td>
+        <td>备注</td>
+        <td>更新时间</td>
+        <td>操作</td>
+    </tr>
+    {% for hotel in hotelList %}
+        <tr>
+            <td>{{ hotel.hotel_name }}</td>
+{#            <td>{{ hotel.business_park }}</td>#}
+{#            <td>{{ hotel.business_park.name }}</td>#}
+            <td>{{ hotel.actual_people_count }}</td>
+            <td>{{ hotel.other_carrier }}</td>
+            <td>{{ hotel.key_person_name }}</td>
+            <td>{{ hotel.key_person_phone }}</td>
+            <td>{{ hotel.competitor_services }}</td>
+            <td>{{ hotel.competitor_price }}</td>
+            <td>{{ hotel.competitor_expiry }}</td>
+            <td>{{ hotel.visitor_name }}</td>
+            <td>{{ hotel.remarks }}</td>
+            <td>{{ hotel.update_time }}</td>
+{#            <td>{{ hotel.business_park_id }}</td>#}
+            <td><a href="update?id={{ hotel.id }}">改</a>
+                <a href="delete/{{ hotel.id }}">删</a></td>
+        </tr>
+    {% endfor %}
+</table>
+
+<hr>
+<form method="get" style="margin-bottom: 20px;">
+    每页显示数量：
+    <select name="per_page" onchange="this.form.submit()">
+        {% for size in [10, 20, 50, 100] %}
+            <option value="{{ size }}" {% if size == per_page %}selected{% endif %}>{{ size }}</option>
+        {% endfor %}
+    </select>
+    <input type="hidden" name="page" value="1">
+</form>
+
+<div>
+    当前第 {{ pagination.page }} 页，共 {{ pagination.pages }} 页，{{ pagination.total }} 条数据。
+</div>
+
+<div>
+    {% if pagination.has_prev %}
+        <a href="{{ url_for('hotel.index', page=1, per_page=per_page) }}">首页</a>
+        <a href="{{ url_for('hotel.index', page=pagination.prev_num, per_page=per_page) }}">上一页</a>
+    {% endif %}
+
+    {% for p in range(1, pagination.pages + 1) %}
+        {% if p == pagination.page %}
+            <strong>{{ p }}</strong>
+        {% else %}
+            <a href="{{ url_for('hotel.index', page=p, per_page=per_page) }}">{{ p }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+        <a href="{{ url_for('hotel.index', page=pagination.next_num, per_page=per_page) }}">下一页</a>
+        <a href="{{ url_for('hotel.index', page=pagination.pages, per_page=per_page) }}">末页</a>
+    {% endif %}
+</div>
+
+</body>
+</html>

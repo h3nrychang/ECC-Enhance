@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改酒店信息</title>
+</head>
+<body>
+<h2>修改酒店信息</h2>
+<form action="update" method="post">
+    <table>
+        {{ form.csrf_token }}
+        <tr>
+            <td>{{ form.hotel_name.label }}</td>
+            <td>{{ form.hotel_name }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.actual_people_count.label }}</td>
+            <td>{{ form.actual_people_count }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.other_carrier.label }}</td>
+            <td>{{ form.other_carrier }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.key_person_name.label }}</td>
+            <td>{{ form.key_person_name }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.key_person_phone.label }}</td>
+            <td>{{ form.key_person_phone }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.competitor_services.label }}</td>
+            <td>{{ form.competitor_services }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.competitor_price.label }}</td>
+            <td>{{ form.competitor_price }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.competitor_expiry.label }}</td>
+            <td>{{ form.competitor_expiry }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.remarks.label }}</td>
+            <td>{{ form.remarks }}</td>
+        </tr>
+        <tr>
+            <td colspan="2">{{ form.submit }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.id(type='hidden') }}</td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

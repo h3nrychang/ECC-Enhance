@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>输入问卷编码</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen bg-gray-100 m-0">
+  <h1 class="text-5xl font-semibold mb-6 text-center">
+    请输入区县管理员提供的 6 位数字
+  </h1>
+
+  <!-- 一行六个输入框，放大尺寸 -->
+  <div class="flex items-center justify-center space-x-4">
+    <input
+      id="digit1"
+      type="tel"
+      maxlength="1"
+      oninput="moveNext(1)"
+      onkeydown="movePrev(event, 1)"
+      autofocus
+      class="w-24 h-24 text-4xl text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+    />
+    <input
+      id="digit2"
+      type="tel"
+      maxlength="1"
+      oninput="moveNext(2)"
+      onkeydown="movePrev(event, 2)"
+      class="w-24 h-24 text-4xl text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+    />
+    <input
+      id="digit3"
+      type="tel"
+      maxlength="1"
+      oninput="moveNext(3)"
+      onkeydown="movePrev(event, 3)"
+      class="w-24 h-24 text-4xl text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+    />
+    <input
+      id="digit4"
+      type="tel"
+      maxlength="1"
+      oninput="moveNext(4)"
+      onkeydown="movePrev(event, 4)"
+      class="w-24 h-24 text-4xl text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+    />
+    <input
+      id="digit5"
+      type="tel"
+      maxlength="1"
+      oninput="moveNext(5)"
+      onkeydown="movePrev(event, 5)"
+      class="w-24 h-24 text-4xl text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+    />
+    <input
+      id="digit6"
+      type="tel"
+      maxlength="1"
+      oninput="moveNext(6)"
+      onkeydown="movePrev(event, 6)"
+      class="w-24 h-24 text-4xl text-center border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-500"
+    />
+  </div>
+
+  <script>
+    function moveNext(index) {
+      const input = document.getElementById('digit' + index);
+      if (input.value.length === 1) {
+        if (index < 6) {
+          document.getElementById('digit' + (index + 1)).focus();
+        } else {
+          let code = '';
+          for (let i = 1; i <= 6; i++) {
+            code += document.getElementById('digit' + i).value;
+          }
+          window.location.href = '/questionnaire/' + code;
+        }
+      }
+    }
+
+    function movePrev(event, index) {
+      const input = document.getElementById('digit' + index);
+      if ((event.keyCode === 8 || event.key === 'Backspace') && input.value === '') {
+        if (index > 1) {
+          document.getElementById('digit' + (index - 1)).focus();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
