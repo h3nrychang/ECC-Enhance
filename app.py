@@ -9,6 +9,7 @@ from blueprint.questionaire import questionaire_bp
 from blueprint.analysis import analysis_bp
 from blueprint.business_park import business_park_bp
 from blueprint.company import company_bp
+from blueprint.chain_band import chain_band_bp
 
 app = Flask(__name__)
 
@@ -29,6 +30,7 @@ app.register_blueprint(analysis_bp)
 app.register_blueprint(business_park_bp)
 app.register_blueprint(company_bp)
 app.register_blueprint(hotel_bp)
+app.register_blueprint(chain_band_bp)
 app.register_blueprint(chain_store_bp)
 
 

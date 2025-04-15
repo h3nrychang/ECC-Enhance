@@ -30,6 +30,18 @@ company_bp = Blueprint('company', __name__, url_prefix='/company')
 #         self.update_time = update_time
 #
 
+class BusinessParkModel(db.Model):
+    '''
+    园区模型
+    '''
+    __tablename__ = 'business_park'
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(500))
+    area = db.Column(db.String(500))
+    company_name = db.Column(db.String(500))
+    remark = db.Column(db.String(500))
+
 class CompanyModel(db.Model):
     __tablename__ = 'company'
     __table_args__ = {'extend_existing': True}
@@ -238,7 +250,7 @@ def update():
             return index()
 
 
-@company_bp.route('/export', methods=['GET'])
+@company_bp.route('/export_old', methods=['GET'])
 def export_file():
     # 1. 查询数据库中的数据
     companies = CompanyModel.query.all()
@@ -281,5 +293,70 @@ def export_file():
         output,
         as_attachment=True,
         download_name=f"company_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+@company_bp.route('/export', methods=['GET'])
+def export_park_company():
+    # 1. 获取所有“楼园-企业”记录
+    pc_list = BusinessParkModel.query.all()
+
+    # 如果没有数据，可以酌情返回提示
+    if not pc_list:
+        return "park_company 表中没有数据可导出"
+
+    # 2. 逐行查找企业详细信息，并将信息拼在一起
+    output_data = []
+    for pc in pc_list:
+        # pc 是 ParkCompanyModel 的一行（id, business_park, company_name）
+        company_detail = CompanyModel.query.filter_by(company_name=pc.company_name).first()
+
+        # 把楼园+企业拼到一个字典
+        row_dict = {
+            'name': pc.name,
+            'company_name': pc.company_name
+        }
+        if company_detail:
+            # 如果查到对应的企业信息，就把详细字段加上
+            row_dict['actual_people_count'] = company_detail.actual_people_count
+            row_dict['other_carrier'] = company_detail.other_carrier
+            row_dict['key_person_name'] = company_detail.key_person_name
+            row_dict['key_person_phone'] = company_detail.key_person_phone
+            row_dict['competitor_services'] = company_detail.competitor_services
+            row_dict['competitor_price'] = company_detail.competitor_price
+            row_dict['competitor_expiry'] = company_detail.competitor_expiry
+            row_dict['visitor_name'] = company_detail.visitor_name
+            row_dict['remarks'] = company_detail.remarks
+            row_dict['update_time'] = company_detail.update_time
+        else:
+            # 如果公司详细信息里没有匹配到，就留空或自定义提示
+            row_dict['actual_people_count'] = ''
+            row_dict['other_carrier'] = ''
+            row_dict['key_person_name'] = ''
+            row_dict['key_person_phone'] = ''
+            row_dict['competitor_services'] = ''
+            row_dict['competitor_price'] = ''
+            row_dict['competitor_expiry'] = ''
+            row_dict['visitor_name'] = ''
+            row_dict['remarks'] = ''
+            row_dict['update_time'] = ''
+
+        output_data.append(row_dict)
+
+    # 3. 用 pandas 生成 DataFrame
+    df = pd.DataFrame(output_data)
+
+    # 4. 写入到 Excel 并使用内存对象保存文件
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='ParkCompanyExport')
+    output.seek(0)
+
+    # 5. 以附件形式返回给浏览器
+    now_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=f"park_company_export_{now_str}.xlsx",
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加连锁品牌</title>
+</head>
+<body>
+添加连锁品牌
+<form action="add" method="post">
+    <table>
+        {{ form.csrf_token }}
+        <tr>
+            <td>{{ form.name.label }}</td>
+            <td>{{ form.name }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.company_name.label }}</td>
+            <td>{{ form.company_name }}</td>
+        </tr>
+        <tr>
+            <td>{{ form.submit }}</td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
