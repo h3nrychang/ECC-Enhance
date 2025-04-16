@@ -286,3 +286,10 @@ def export_file():
         download_name=f"hotel_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+@hotel_bp.route('/delete/<int:id>')
+def delete(id):
+    hotel = HotelModel.query.get(id)
+    db.session.delete(hotel)
+    db.session.commit()
+    return index()

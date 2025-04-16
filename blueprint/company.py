@@ -380,3 +380,10 @@ def export_park_company():
         download_name=f"楼园企业导出_{now_str}.xlsx",
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+@company_bp.route('/delete/<int:id>')
+def delete(id):
+    company = CompanyModel.query.get(id)
+    db.session.delete(company)
+    db.session.commit()
+    return index()

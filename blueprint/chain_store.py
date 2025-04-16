@@ -378,3 +378,10 @@ def export_file():
         download_name=f"连锁品牌商铺导出_{now_str}.xlsx",
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+@chain_store_bp.route('/delete/<int:id>')
+def delete(id):
+    chain_store = ChainStoreModel.query.get(id)
+    db.session.delete(chain_store)
+    db.session.commit()
+    return index()
