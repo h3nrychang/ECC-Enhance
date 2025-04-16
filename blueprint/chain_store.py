@@ -30,6 +30,18 @@ chain_store_bp = Blueprint('chain_store', __name__, url_prefix='/chain_store')
 #         self.update_time = update_time
 #
 
+class ChainBandModel(db.Model):
+    '''
+    连锁品牌模型
+    '''
+    __tablename__ = 'chain_band'
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    band = db.Column(db.String(500))
+    area = db.Column(db.String(500))
+    store = db.Column(db.String(500))
+    remark = db.Column(db.String(500))
+
 class ChainStoreModel(db.Model):
     __tablename__ = 'chain_store'
     __table_args__ = {'extend_existing': True}
@@ -240,8 +252,8 @@ def update():
             return index()
 
 
-@chain_store_bp.route('/export', methods=['GET'])
-def export_file():
+@chain_store_bp.route('/export_old', methods=['GET'])
+def export_file_old():
     # 1. 查询数据库中的数据
     companies = ChainStoreModel.query.all()
 
@@ -283,5 +295,86 @@ def export_file():
         output,
         as_attachment=True,
         download_name=f"chain_store_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+
+@chain_store_bp.route('/export', methods=['GET'])
+def export_file():
+    # 1. 获取所有“品牌-商店”记录
+    bs_list = ChainBandModel.query.all()
+
+    # 如果没有数据，可以酌情返回提示
+    if not bs_list:
+        return "没有设置连锁企业"
+
+    # 2. 逐行查找企业详细信息，并将信息拼在一起
+    output_data = []
+    for bs in bs_list:
+        # pc 是 ParkCompanyModel 的一行（id, business_park, company_name）
+        store_detail = ChainStoreModel.query.filter_by(chain_store_name=bs.store).first()
+
+        # 把楼园+企业拼到一个字典
+        row_dict = {
+            'band': bs.band,
+            'store': bs.store
+        }
+        if store_detail:
+            # 如果查到对应的企业信息，就把详细字段加上
+            row_dict['actual_people_count'] = store_detail.actual_people_count
+            row_dict['other_carrier'] = store_detail.other_carrier
+            row_dict['key_person_name'] = store_detail.key_person_name
+            row_dict['key_person_phone'] = store_detail.key_person_phone
+            row_dict['competitor_services'] = store_detail.competitor_services
+            row_dict['competitor_price'] = store_detail.competitor_price
+            row_dict['competitor_expiry'] = store_detail.competitor_expiry
+            row_dict['visitor_name'] = store_detail.visitor_name
+            row_dict['remarks'] = store_detail.remarks
+            row_dict['update_time'] = store_detail.update_time
+        else:
+            # 如果公司详细信息里没有匹配到，就留空或自定义提示
+            row_dict['actual_people_count'] = ''
+            row_dict['other_carrier'] = ''
+            row_dict['key_person_name'] = ''
+            row_dict['key_person_phone'] = ''
+            row_dict['competitor_services'] = ''
+            row_dict['competitor_price'] = ''
+            row_dict['competitor_expiry'] = ''
+            row_dict['visitor_name'] = ''
+            row_dict['remarks'] = ''
+            row_dict['update_time'] = ''
+
+        output_data.append(row_dict)
+
+    # 3. 用 pandas 生成 DataFrame
+    df = pd.DataFrame(output_data)
+
+    df.rename(columns={
+        "band": "连锁品牌名称",
+        "store": "连锁商铺名称",
+        "actual_people_count": "单位实际人数",
+        "other_carrier": "异网运营商",
+        "key_person_name": "关键人姓名",
+        "key_person_phone": "关键人电话",
+        "competitor_services": "友商已有业务",
+        "competitor_price": "友商合同价格",
+        "competitor_expiry": "友商产品到期时间",
+        "visitor_name": "拜访人",
+        "remarks": "备注",
+        "update_time": "更新时间"
+    }, inplace=True)
+
+    # 4. 写入到 Excel 并使用内存对象保存文件
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='连锁品牌商铺导出')
+    output.seek(0)
+
+    # 5. 以附件形式返回给浏览器
+    now_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name=f"连锁品牌商铺导出_{now_str}.xlsx",
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )

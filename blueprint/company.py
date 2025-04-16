@@ -16,8 +16,8 @@ from wtforms.validators import DataRequired
 # from blueprint.business_park import BusinessParkModel
 from exts import db
 
-
 company_bp = Blueprint('company', __name__, url_prefix='/company')
+
 
 # class Company:
 #     def __init__(self, name, a, b, c, d, e, update_time):
@@ -42,6 +42,7 @@ class BusinessParkModel(db.Model):
     company_name = db.Column(db.String(500))
     remark = db.Column(db.String(500))
 
+
 class CompanyModel(db.Model):
     __tablename__ = 'company'
     __table_args__ = {'extend_existing': True}
@@ -61,6 +62,7 @@ class CompanyModel(db.Model):
     # business_park = db.relationship('BusinessParkModel')
     business_park = db.Column(db.String(500))
 
+
 class CompanyForm(FlaskForm):
     company_name = StringField('企业名称', validators=[DataRequired()])
     actual_people_count = StringField('单位实际人数')
@@ -74,6 +76,7 @@ class CompanyForm(FlaskForm):
     remarks = StringField('备注')
     id = StringField('ID')  # 如果你要传 hidden id
     submit = SubmitField('提交')
+
 
 # class CompanyForm(FlaskForm):
 #     company_name = StringField('Company Name', validators=[DataRequired()])
@@ -138,7 +141,7 @@ def add():
                 remarks=data['remarks'],
                 update_time=data['update_time'],
                 # business_park_id=data['business_park']
-                business_park=data['business_park']
+                # business_park=data['business_park']
             )
             db.session.add(company)
             db.session.commit()
@@ -169,7 +172,7 @@ def upload_file():
         return render_template('error/400.html', error='无法读取Excel文件，请确认格式')
 
     expected_fields = [
-        "company_name", "business_park", "visitor_name", "actual_people_count",
+        "company_name", "visitor_name", "actual_people_count",
         "other_carrier", "key_person_name", "key_person_phone",
         "competitor_services", "competitor_price", "competitor_expiry",
         "remarks", "update_time"
@@ -210,6 +213,7 @@ def upload_file():
     db.session.commit()
     flash('导入完成')
     return redirect(request.url)
+
 
 @company_bp.route('/update', methods=['GET', 'POST'])
 def update():
@@ -296,6 +300,7 @@ def export_file():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
 
+
 @company_bp.route('/export', methods=['GET'])
 def export_park_company():
     # 1. 获取所有“楼园-企业”记录
@@ -303,7 +308,7 @@ def export_park_company():
 
     # 如果没有数据，可以酌情返回提示
     if not pc_list:
-        return "park_company 表中没有数据可导出"
+        return "没有设置楼园"
 
     # 2. 逐行查找企业详细信息，并将信息拼在一起
     output_data = []
@@ -346,10 +351,25 @@ def export_park_company():
     # 3. 用 pandas 生成 DataFrame
     df = pd.DataFrame(output_data)
 
+    df.rename(columns={
+        "name": "楼园名称",
+        "company_name": "企业名称",
+        "actual_people_count": "单位实际人数",
+        "other_carrier": "异网运营商",
+        "key_person_name": "关键人姓名",
+        "key_person_phone": "关键人电话",
+        "competitor_services": "友商已有业务",
+        "competitor_price": "友商合同价格",
+        "competitor_expiry": "友商产品到期时间",
+        "visitor_name": "拜访人",
+        "remarks": "备注",
+        "update_time": "更新时间"
+    }, inplace=True)
+
     # 4. 写入到 Excel 并使用内存对象保存文件
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='ParkCompanyExport')
+        df.to_excel(writer, index=False, sheet_name='楼园企业导出')
     output.seek(0)
 
     # 5. 以附件形式返回给浏览器
@@ -357,6 +377,6 @@ def export_park_company():
     return send_file(
         output,
         as_attachment=True,
-        download_name=f"park_company_export_{now_str}.xlsx",
+        download_name=f"楼园企业导出_{now_str}.xlsx",
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )

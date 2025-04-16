@@ -16,17 +16,17 @@ class ChainBandModel(db.Model):
     __tablename__ = 'chain_band'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(500))
+    band = db.Column(db.String(500))
     area = db.Column(db.String(500))
-    company_name = db.Column(db.String(500))
+    store = db.Column(db.String(500))
     remark = db.Column(db.String(500))
 
 
 class ChainBandForm(FlaskForm):
     # id = Column(Integer, primary_key=True)
     id = HiddenField()
-    name = StringField('连锁品牌名称', render_kw={'placeholder': '请输入连锁品牌名称'}, validators=[DataRequired()])
-    company_name = StringField('连锁店铺名称', render_kw={'placeholder': '请输入连锁店铺名称'})
+    band = StringField('连锁品牌名称', render_kw={'placeholder': '请输入连锁品牌名称'}, validators=[DataRequired()])
+    store = StringField('连锁店铺名称', render_kw={'placeholder': '请输入连锁店铺名称'})
     submit = SubmitField('确定')
 
 
@@ -57,16 +57,16 @@ def update():
         id = request.args.get('id', type=int)
         chanBand = ChainBandModel.query.get(id)
         chanBandForm.id.data = chanBand.id
-        chanBandForm.name.data = chanBand.name
-        chanBandForm.company_name.data = chanBand.company_name
+        chanBandForm.band.data = chanBand.band
+        chanBandForm.store.data = chanBand.store
         return render_template('chain_band/update.html', form=chanBandForm)
     else:
         if chanBandForm.validate_on_submit():
             data = chanBandForm.data
             # chanBandModel = ChainBandModel(name=data['name'], company_name=data['company_name'])
             chanBand = ChainBandModel.query.get(data['id'])
-            chanBand.name = data['name']
-            chanBand.company_name = data['company_name']
+            chanBand.band = data['band']
+            chanBand.store = data['store']
             db.session.add(chanBand)
             db.session.commit()
             return index()

@@ -16,14 +16,14 @@
         <td>操作</td>
     </tr>
 
-    {% for businessPark in businessParkList %}
+    {% for chain_band in chanBandList %}
         <tr>
             {#    {{ businessPark.id }}，#}
-            <td>{{ businessPark.name }}</td>
-            <td>{{ businessPark.company_name }}</td>
+            <td>{{ chain_band.band }}</td>
+            <td>{{ chain_band.store }}</td>
             <td>
-                <a href="update?id={{ businessPark.id }}">修改</a>
-                <a href="delete/{{ businessPark.id }}">删除</a>
+                <a href="update?id={{ chain_band.id }}">修改</a>
+                <a href="delete/{{ chain_band.id }}">删除</a>
             </td>
         </tr>
         {#            <br>#}
