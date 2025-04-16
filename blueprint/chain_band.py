@@ -87,7 +87,7 @@ def delete(id):
 @chain_band_bp.route('/import', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'GET':
-        return render_template('business_park/upload.html')
+        return render_template('chain_band/upload.html')
 
     file = request.files.get('file')
     if not file:
