@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
 from sqlalchemy import text
+from flasgger import Swagger
+from flask_cors import CORS
 
 from blueprint.chain_store import chain_store_bp
 from blueprint.hotel import hotel_bp
@@ -11,11 +13,19 @@ from blueprint.business_park import business_park_bp
 from blueprint.company import company_bp
 from blueprint.chain_band import chain_band_bp
 
+from api.business_park_api import business_park_api_bp
+from api.company import company_api_bp
+from api.hotel import hotel_api_bp
+from api.chain_band import chain_band_api_bp
+from api.chain_store import chain_store_api_bp
+
 app = Flask(__name__)
+CORS(app)
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:toor@localhost:3306/ecc_enhance_db?charset=utf8'
 app.config.from_object('config')
 app.config['SECRET_KEY'] = '1234567890'
+swagger = Swagger(app)
 
 
 db.init_app(app)
@@ -32,6 +42,13 @@ app.register_blueprint(company_bp)
 app.register_blueprint(hotel_bp)
 app.register_blueprint(chain_band_bp)
 app.register_blueprint(chain_store_bp)
+
+
+app.register_blueprint(business_park_api_bp)
+app.register_blueprint(company_api_bp)
+app.register_blueprint(hotel_api_bp)
+app.register_blueprint(chain_band_api_bp)
+app.register_blueprint(chain_store_api_bp)
 
 
 with app.app_context():
